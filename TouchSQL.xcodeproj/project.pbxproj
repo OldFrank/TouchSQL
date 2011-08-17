@@ -6,20 +6,6 @@
 	objectVersion = 42;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		45603B4C0D838D48005B99BF /* All */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 45603B570D838D5C005B99BF /* Build configuration list for PBXAggregateTarget "All" */;
-			buildPhases = (
-			);
-			dependencies = (
-				45603B500D838D5A005B99BF /* PBXTargetDependency */,
-			);
-			name = All;
-			productName = All;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		45552D5B0856C5B7006456A2 /* UnitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 45552D590856C5B7006456A2 /* UnitTests.m */; };
 		45552D650856C5D5006456A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -83,12 +69,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		45603B4F0D838D5A005B99BF /* PBXContainerItemProxy */ = {
+		4566EA4813FC81F900EED05E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = ToxicSQL;
+			remoteInfo = TouchSQL;
 		};
 		45E931C90856C16000B7327A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -365,6 +351,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4566EA4913FC81F900EED05E /* PBXTargetDependency */,
 			);
 			name = Demo;
 			productName = Demo;
@@ -379,7 +366,6 @@
 				8DC2EF520486A6940098B216 /* Resources */,
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
-				8DC2EF580486A6940098B216 /* Rez */,
 				45E2606E0EEF28840014A071 /* ShellScript */,
 			);
 			buildRules = (
@@ -409,7 +395,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				45603B4C0D838D48005B99BF /* All */,
 				45F5DFA60FBF49C7004029AE /* Demo */,
 				8DC2EF4F0486A6940098B216 /* TouchSQL */,
 				45E931A40856C12500B7327A /* UnitTests */,
@@ -435,16 +420,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXRezBuildPhase section */
-		8DC2EF580486A6940098B216 /* Rez */ = {
-			isa = PBXRezBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXRezBuildPhase section */
-
 /* Begin PBXShellScriptBuildPhase section */
 		45E2606E0EEF28840014A071 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -457,7 +432,8 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "BRIDGE_SUPPORT_DIR=$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/Resources/BridgeSupport\n\necho \"##### $BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\n\nmkdir -p \"$BRIDGE_SUPPORT_DIR\"\n\ngen_bridge_metadata --framework \"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\" --output \"$BRIDGE_SUPPORT_DIR/$PRODUCT_NAME.bridgesupport\" || exit 1\n";
+			shellScript = "exit 0\n\nBRIDGE_SUPPORT_DIR=$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME/Resources/BridgeSupport\n\necho \"##### $BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\"\n\nmkdir -p \"$BRIDGE_SUPPORT_DIR\"\n\ngen_bridge_metadata --framework \"$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME\" --output \"$BRIDGE_SUPPORT_DIR/$PRODUCT_NAME.bridgesupport\" || exit 1\n";
+			showEnvVarsInLog = 0;
 		};
 		45E931A30856C12500B7327A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -538,10 +514,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		45603B500D838D5A005B99BF /* PBXTargetDependency */ = {
+		4566EA4913FC81F900EED05E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* TouchSQL */;
-			targetProxy = 45603B4F0D838D5A005B99BF /* PBXContainerItemProxy */;
+			targetProxy = 4566EA4813FC81F900EED05E /* PBXContainerItemProxy */;
 		};
 		45E931CA0856C16000B7327A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -562,29 +538,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		45603B4D0D838D49005B99BF /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = All;
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		45603B4E0D838D49005B99BF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				PRODUCT_NAME = All;
-				SDKROOT = macosx;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		45E92DA50856B35600B7327A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -790,15 +743,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		45603B570D838D5C005B99BF /* Build configuration list for PBXAggregateTarget "All" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				45603B4D0D838D49005B99BF /* Debug */,
-				45603B4E0D838D49005B99BF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		45E92DA40856B35600B7327A /* Build configuration list for PBXNativeTarget "TouchSQL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
