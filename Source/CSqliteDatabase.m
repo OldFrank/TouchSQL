@@ -39,14 +39,15 @@
 NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
 
 @interface CSqliteDatabase ()
-@property (readwrite, retain) NSString *path;
-@property (readwrite, assign) sqlite3 *sql;
-@property (readwrite, retain) NSMutableDictionary *userDictionary;
+@property (readwrite, nonatomic, retain) NSString *path;
+@property (readwrite, nonatomic, assign) sqlite3 *sql;
+@property (readwrite, nonatomic, retain) NSMutableDictionary *userDictionary;
 @end
 
 @implementation CSqliteDatabase
 
 @synthesize path;
+@synthesize userDictionary;
 
 - (id)initWithPath:(NSString *)inPath
 {
@@ -121,15 +122,6 @@ if (sql != inSql)
 if (userDictionary == NULL)
 	userDictionary = [[NSMutableDictionary alloc] init];
 return(userDictionary);
-}
-
-- (void)setUserDictionary:(NSMutableDictionary *)inUserDictionary
-{
-if (userDictionary != inUserDictionary)
-	{
-	[userDictionary autorelease];
-	userDictionary = [inUserDictionary retain];
-    }
 }
 
 #pragma mark -

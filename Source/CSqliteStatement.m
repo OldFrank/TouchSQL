@@ -174,7 +174,7 @@ if ([inValue isKindOfClass:[NSData class]])
 	}
 else if ([inValue isKindOfClass:[NSNumber class]])
 	{
-	CFNumberType theType = CFNumberGetType((CFNumberRef)inValue);
+	CFNumberType theType = CFNumberGetType((__bridge CFNumberRef)inValue);
 	switch (theType)
 		{
 		case kCFNumberFloat32Type:
@@ -189,7 +189,7 @@ else if ([inValue isKindOfClass:[NSNumber class]])
 		case kCFNumberSInt64Type:
 			{
 			sqlite_int64 theInt64;
-			CFNumberGetValue((CFNumberRef)inValue, kCFNumberSInt64Type, &theInt64);
+			CFNumberGetValue((__bridge CFNumberRef)inValue, kCFNumberSInt64Type, &theInt64);
 			theResult = sqlite3_bind_int64(self.statement, theParameterIndex, theInt64);
 			}
 			break;
@@ -422,7 +422,7 @@ while (theObjectCount < len && [self step:&theError] == YES)
 	stackbuf[theObjectCount++] = theRow;
 	}
 
-state->itemsPtr = stackbuf;
+state->itemsPtr = (__bridge void *)stackbuf;
 
 return(theObjectCount);
 }

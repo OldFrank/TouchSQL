@@ -84,15 +84,6 @@ if (tableName == NULL)
 return(tableName); 
 }
 
-- (void)setTableName:(NSString *)inTableName
-{
-if (tableName != inTableName)
-	{
-	[tableName autorelease];
-	tableName = [inTableName retain];
-    }
-}
-
 #pragma mark -
 
 - (BOOL)createTable:(NSError **)outError

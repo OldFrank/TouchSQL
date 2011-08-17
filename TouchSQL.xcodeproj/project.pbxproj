@@ -549,6 +549,7 @@
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = NO;
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
@@ -588,6 +589,7 @@
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = NO;
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
@@ -622,7 +624,8 @@
 					ppc,
 					i386,
 				);
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				RUN_CLANG_STATIC_ANALYZER = YES;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -633,7 +636,8 @@
 					ppc,
 					i386,
 				);
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				RUN_CLANG_STATIC_ANALYZER = YES;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -650,6 +654,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = UnitTests/Resources/Info.plist;
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				LIBRARY_STYLE = BUNDLE;
@@ -677,6 +682,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = UnitTests/Resources/Info.plist;
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				LIBRARY_STYLE = BUNDLE;
@@ -705,6 +711,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/bin;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lsqlite3";
@@ -726,6 +733,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INSTALL_PATH = /usr/local/bin;
 				OTHER_LDFLAGS = (
 					"-framework",
