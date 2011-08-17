@@ -37,7 +37,7 @@
 
 - (void)testDatabaseCreate;
 {
-	CSqliteDatabase *db = [[[CSqliteDatabase alloc] initInMemory] autorelease];
+	CSqliteDatabase *db = [[CSqliteDatabase alloc] initInMemory];
 	
 	BOOL result;
 	
@@ -52,7 +52,7 @@
 
 - (void)testInsert;
 {
-	CSqliteDatabase *db = [[[CSqliteDatabase alloc] initInMemory] autorelease];
+	CSqliteDatabase *db = [[CSqliteDatabase alloc] initInMemory];
 	[db open:NULL];
 	
 	BOOL result;
@@ -74,7 +74,7 @@
 
 - (void)testEnumerate;
 {
-	CSqliteDatabase *db = [[[CSqliteDatabase alloc] initInMemory] autorelease];
+	CSqliteDatabase *db = [[CSqliteDatabase alloc] initInMemory];
 	[db open:NULL];
 	
 	[db executeExpression:@"create table foo (name varchar(100))" error:NULL];

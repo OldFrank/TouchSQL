@@ -32,8 +32,6 @@
 #include "CSqliteStatement.h"
 
 @interface CSqliteEnumerator : NSEnumerator {
-	CSqliteStatement *statement;
-	BOOL resultsAsDictionary;
 }
 
 - (id)initWithStatement:(CSqliteStatement *)inStatement resultsAsDictionary:(BOOL)inResultsAsDictionary;

@@ -49,10 +49,10 @@
 {
 va_list theArgList;
 va_start(theArgList, inFormat);
-NSString *theString = [[[NSString alloc] initWithFormat:inFormat arguments:theArgList] autorelease];
+NSString *theString = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
 va_end(theArgList);
 
-return([[[self alloc] initWithDatabase:inDatabase string:theString] autorelease]);
+return([[self alloc] initWithDatabase:inDatabase string:theString]);
 }
 
 - (id)initWithDatabase:(CSqliteDatabase *)inDatabase string:(NSString *)inString;
@@ -68,10 +68,8 @@ return(self);
 - (void)dealloc
 {
 self.database = NULL;
-self.statementString = NULL;
 self.statement = NULL;
 //
-[super dealloc];
 }
 
 #pragma mark -
@@ -404,7 +402,7 @@ return(theRowDictionaries);
 
 #pragma mark -
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id *)stackbuf count:(NSUInteger)len;
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])stackbuf count:(NSUInteger)len;
 {
 if (state->state == 0)
 	{
@@ -422,14 +420,14 @@ while (theObjectCount < len && [self step:&theError] == YES)
 	stackbuf[theObjectCount++] = theRow;
 	}
 
-state->itemsPtr = (__bridge void *)stackbuf;
+state->itemsPtr = stackbuf;
 
 return(theObjectCount);
 }
 
 - (NSEnumerator *)enumerator
 {
-return([[[CSqliteEnumerator alloc] initWithStatement:self] autorelease]);
+return([[CSqliteEnumerator alloc] initWithStatement:self]);
 }
 
 @end

@@ -30,7 +30,7 @@
 #import "CSqliteEnumerator.h"
 
 @interface CSqliteEnumerator ()
-@property (readwrite, retain) CSqliteStatement *statement;
+@property (readwrite, strong) CSqliteStatement *statement;
 @property (readwrite, assign) BOOL resultsAsDictionary;
 @end
 
@@ -54,12 +54,6 @@ return(self);
 return([self initWithStatement:inStatement resultsAsDictionary:YES]);
 }
 
-- (void)dealloc
-{
-self.statement = NULL;
-//
-[super dealloc];
-}
 
 #pragma mark -
 

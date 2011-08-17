@@ -40,13 +40,13 @@ static NSDateFormatter *gDateFormatter = NULL;
 // 2008-09-09 02:12:36
 	if (gDateFormatter == NULL)
 		{
-		NSDateFormatter *theFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		NSDateFormatter *theFormatter = [[NSDateFormatter alloc] init];
 		[theFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
 		[theFormatter setGeneratesCalendarDates:NO];
 		[theFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
 		[theFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
 		
-		gDateFormatter = [theFormatter retain];
+		gDateFormatter = theFormatter;
 		}
 	}
 return(gDateFormatter);
@@ -58,13 +58,13 @@ return(gDateFormatter);
 	{
 		if (gDateFormatter == NULL)
 		{
-			NSDateFormatter *theFormatter = [[[NSDateFormatter alloc] init] autorelease];
+			NSDateFormatter *theFormatter = [[NSDateFormatter alloc] init];
 			[theFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
 			[theFormatter setGeneratesCalendarDates:NO];
 			[theFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
 			[theFormatter setDateFormat:@"yyyy-MM-dd"];
 			
-			gDateFormatter = [theFormatter retain];
+			gDateFormatter = theFormatter;
 		}
 	}
 	return(gDateFormatter);

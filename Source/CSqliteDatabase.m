@@ -39,22 +39,23 @@
 NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
 
 @interface CSqliteDatabase ()
-@property (readwrite, nonatomic, retain) NSString *path;
+@property (readwrite, nonatomic, strong) NSString *path;
 @property (readwrite, nonatomic, assign) sqlite3 *sql;
-@property (readwrite, nonatomic, retain) NSMutableDictionary *userDictionary;
+@property (readwrite, nonatomic, strong) NSMutableDictionary *userDictionary;
 @end
 
 @implementation CSqliteDatabase
 
 @synthesize path;
+@synthesize sql;
 @synthesize userDictionary;
 
 - (id)initWithPath:(NSString *)inPath
 {
 if (self = ([self init]))
-	{
-	self.path = inPath;
-	}
+    {
+    path = inPath;
+    }
 return(self);
 }
 
@@ -65,11 +66,7 @@ return([self initWithPath:@":memory:"]);
 
 - (void)dealloc
 {
-self.path = NULL;
-self.sql = NULL;
-self.userDictionary = NULL;
-//
-[super dealloc];
+[self close];
 }
 
 #pragma mark -
@@ -77,50 +74,53 @@ self.userDictionary = NULL;
 - (BOOL)open:(NSError **)outError
 {
 if (sql == NULL)
-	{
-	sqlite3 *theSql = NULL;
-	int theResult = sqlite3_open([self.path UTF8String], &theSql);
-	if (theResult != SQLITE_OK)
-		{
-		if (outError)
-			*outError = [NSError errorWithDomain:TouchSQLErrorDomain code:theResult userInfo:NULL];
-		return(NO);
-		}
-	self.sql = theSql;
-	}
+    {
+    sqlite3 *theSql = NULL;
+    int theResult = sqlite3_open([self.path UTF8String], &theSql);
+    if (theResult != SQLITE_OK)
+        {
+        if (outError)
+            *outError = [NSError errorWithDomain:TouchSQLErrorDomain code:theResult userInfo:NULL];
+        return(NO);
+        }
+    self.sql = theSql;
+    }
 return(YES);
 }
 
 - (void)close
 {
-self.sql = NULL;
-}
-
-- (sqlite3 *)sql
-{
-return(sql);
+if (self.sql)
+    {
+    if (sqlite3_close(self.sql) == SQLITE_BUSY)
+        {
+        NSLog(@"sqlite3_close() failed with SQLITE_BUSY!");
+        }
+    self.sql = NULL;
+    }
 }
 
 - (void)setSql:(sqlite3 *)inSql
 {
 if (sql != inSql)
-	{
-	if (sql != NULL)
-		{
-		if (sqlite3_close(sql) == SQLITE_BUSY)
-			NSLog(@"sqlite3_close() failed with SQLITE_BUSY!");
-		sql = NULL;
-		}
-	sql = inSql;
-	}
+    {
+    if (sql != NULL)
+        {
+        if (sqlite3_close(sql) == SQLITE_BUSY)
+            NSLog(@"sqlite3_close() failed with SQLITE_BUSY!");
+        sql = NULL;
+        }
+    sql = inSql;
+    }
 }
-
 
 
 - (NSMutableDictionary *)userDictionary
 {
 if (userDictionary == NULL)
-	userDictionary = [[NSMutableDictionary alloc] init];
+    {
+    userDictionary = [[NSMutableDictionary alloc] init];
+    }
 return(userDictionary);
 }
 
@@ -131,7 +131,7 @@ return(userDictionary);
 CSqliteStatement *theStatement = [self.userDictionary objectForKey:@"BEGIN TRANSACTION"];
 if (theStatement == NULL)
 	{
-	theStatement = [[[CSqliteStatement alloc] initWithDatabase:self string:@"BEGIN TRANSACTION"] autorelease];
+	theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"BEGIN TRANSACTION"];
 	[self.userDictionary setObject:theStatement forKey:@"BEGIN TRANSACTION"];
 	}
 return([theStatement execute:NULL]);
@@ -142,7 +142,7 @@ return([theStatement execute:NULL]);
 CSqliteStatement *theStatement = [self.userDictionary objectForKey:@"COMMIT"];
 if (theStatement == NULL)
 	{
-	theStatement = [[[CSqliteStatement alloc] initWithDatabase:self string:@"COMMIT"] autorelease];
+	theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"COMMIT"];
 	[self.userDictionary setObject:theStatement forKey:@"COMMIT"];
 	}
 return([theStatement execute:NULL]);
@@ -153,7 +153,7 @@ return([theStatement execute:NULL]);
 CSqliteStatement *theStatement = [self.userDictionary objectForKey:@"ROLLBACK"];
 if (theStatement == NULL)
 	{
-	theStatement = [[[CSqliteStatement alloc] initWithDatabase:self string:@"ROLLBACK"] autorelease];
+	theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"ROLLBACK"];
 	[self.userDictionary setObject:theStatement forKey:@"ROLLBACK"];
 	}
 return([theStatement execute:NULL]);
@@ -178,7 +178,7 @@ return(theResult == SQLITE_OK ? YES : NO);
 - (NSEnumerator *)enumeratorForExpression:(NSString *)inExpression error:(NSError **)outError
 {
 #pragma unused (outError)
-CSqliteStatement *theStatement = [[[CSqliteStatement alloc] initWithDatabase:self string:inExpression] autorelease];
+CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
 return([theStatement enumerator]);
 }
 

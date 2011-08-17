@@ -34,12 +34,9 @@
 @class CSqliteDatabase;
 
 @interface CSqliteStatement : NSObject <NSFastEnumeration> {
-	CSqliteDatabase *database;
-	NSString *statementString;
-	sqlite3_stmt *statement;
 }
 
-@property (readonly, nonatomic, assign) CSqliteDatabase *database;
+@property (readonly, nonatomic, weak) CSqliteDatabase *database;
 @property (readonly, nonatomic, copy) NSString *statementString;
 @property (readonly, nonatomic, assign) sqlite3_stmt *statement;
 

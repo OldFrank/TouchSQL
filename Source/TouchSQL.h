@@ -40,13 +40,9 @@
 //#import <TouchSQL/NSDate_SqlExtension.h>
 //#import <TouchSQL/NSDictionary_SqlExtensions.h>
 //#import <TouchSQL/NSString_SqlExtensions.h>
-#import "CRandomAccessTemporaryTable.h"
-#import "CSqliteDatabase_Deprecated.h"
 #import "CSqliteDatabase_Extensions.h"
 #import "CSqliteDatabase.h"
 #import "CSqliteStatement.h"
 #import "NSArray_SqlExtensions.h"
-#import "NSData_SqlExtensions.h"
 #import "NSDate_SqlExtension.h"
-#import "NSDictionary_SqlExtensions.h"
 #import "NSString_SqlExtensions.h"

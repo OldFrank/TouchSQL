@@ -36,14 +36,11 @@ extern NSString *TouchSQLErrorDomain /* = @"TouchSQLErrorDomain" */;
 @class CSqliteStatement;
 
 @interface CSqliteDatabase : NSObject {
-	NSString *path;
-	sqlite3 *sql;
-	NSMutableDictionary *userDictionary;
 }
 
-@property (readonly, nonatomic, retain) NSString *path;
+@property (readonly, nonatomic, strong) NSString *path;
 @property (readonly, nonatomic, assign) sqlite3 *sql;
-@property (readonly, nonatomic, retain) NSMutableDictionary *userDictionary;
+@property (readonly, nonatomic, strong) NSMutableDictionary *userDictionary;
 
 - (id)initWithPath:(NSString *)inPath;
 - (id)initInMemory;
