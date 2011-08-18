@@ -41,34 +41,27 @@
 @property (readonly, nonatomic, copy) NSString *statementString;
 @property (readonly, nonatomic, assign) sqlite3_stmt *statement;
 @property (readonly, nonatomic, strong) NSArray *columnNames;
-
-+ (CSqliteStatement *)statementWithDatabase:(CSqliteDatabase *)inDatabase format:(NSString *)inFormat, ...;
+@property (readonly, nonatomic, assign) BOOL done;
 
 - (id)initWithDatabase:(CSqliteDatabase *)inDatabase string:(NSString *)inString;
 
 - (BOOL)prepare:(NSError **)outError;
-
+- (BOOL)step:(NSError **)outError;
+- (BOOL)execute:(NSError **)outError;
 - (BOOL)reset:(NSError **)outError;
+
+- (NSInteger)columnCount:(NSError **)outError;
+- (NSString *)columnNameAtIndex:(NSInteger)inIndex error:(NSError **)outError;
+- (NSArray *)columnNames:(NSError **)outError;
+- (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError;
 
 - (BOOL)clearBindings:(NSError **)outError;
 - (BOOL)bindValue:(id)inValue toBinding:(NSString *)inBinding transientValue:(BOOL)inTransientValues error:(NSError **)outError;
 - (BOOL)bindValues:(NSDictionary *)inValues transientValues:(BOOL)inTransientValues error:(NSError **)outError;
 
-- (BOOL)execute:(NSError **)outError;
-
-- (BOOL)step:(NSError **)outError;
-
-- (NSInteger)columnCount:(NSError **)outError;
-
-- (NSString *)columnNameAtIndex:(NSInteger)inIndex error:(NSError **)outError;
-- (NSArray *)columnNames:(NSError **)outError;
-
-- (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError;
-- (id)columnValueForName:(NSString *)inName error:(NSError **)outError;
-
-
-- (NSEnumerator *)enumerator;
 - (CSqliteRow *)row:(NSError **)outError;
 - (NSArray *)rows:(NSError **)outError;
+
+- (NSEnumerator *)enumerator;
 
 @end

@@ -34,57 +34,55 @@
 @implementation CSqliteDatabase (CSqliteDatabase_Extensions)
 
 - (BOOL)executeExpression:(NSString *)inExpression error:(NSError **)outError
-{
-NSAssert(self.sql != NULL, @"Database not open.");
+    {
+    NSAssert(self.sql != NULL, @"Database not open.");
 
-int theResult = sqlite3_exec(self.sql, [inExpression UTF8String], NULL, NULL, NULL);
-if (theResult != SQLITE_OK)
-	{
-	if (outError)
+    int theResult = sqlite3_exec(self.sql, [inExpression UTF8String], NULL, NULL, NULL);
+    if (theResult != SQLITE_OK)
         {
-		*outError = [self currentError];
+        if (outError)
+            {
+            *outError = [self currentError];
+            }
         }
-	}
 
-return(theResult == SQLITE_OK ? YES : NO);
-}
+    return(theResult == SQLITE_OK ? YES : NO);
+    }
 
 - (NSEnumerator *)enumeratorForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-#pragma unused (outError)
-CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
-return([theStatement enumerator]);
-}
+    {
+    #pragma unused (outError)
+    CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
+    return([theStatement enumerator]);
+    }
 
 - (NSArray *)rowsForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
-return([theStatement rows:outError]);
-}
+    {
+    CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
+    return([theStatement rows:outError]);
+    }
 
-
-// TODO -- most of these methods can be heavily optimised and more error checking added (search for NULL)
 
 - (NSDictionary *)rowForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-NSArray *theRows = [self rowsForExpression:inExpression error:outError];
-if ([theRows count] > 0)
-	return([theRows objectAtIndex:0]);
-else
-	return(NULL);
-}
+    {
+    NSArray *theRows = [self rowsForExpression:inExpression error:outError];
+    if ([theRows count] > 0)
+        return([theRows objectAtIndex:0]);
+    else
+        return(NULL);
+    }
 
 - (NSArray *)valuesForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-NSDictionary *theRow = [self rowForExpression:inExpression error:outError];
-return([theRow allValues]);
-}
+    {
+    NSDictionary *theRow = [self rowForExpression:inExpression error:outError];
+    return([theRow allValues]);
+    }
 
 - (id)valueForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-NSArray *theValues = [self valuesForExpression:inExpression error:outError];
-// TODO -- check only 1 object is returned?
-return([theValues lastObject]);
-}
+    {
+    NSArray *theValues = [self valuesForExpression:inExpression error:outError];
+    // TODO -- check only 1 object is returned?
+    return([theValues lastObject]);
+    }
 
 @end

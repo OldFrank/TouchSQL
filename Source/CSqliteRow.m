@@ -27,18 +27,24 @@
     if ((self = [super init]) != NULL)
         {
         statement = inStatement;
-                    
-        int theColumnCount = (int)[statement columnCount:NULL];
+        
+        NSError *theError = NULL;
+        
+        NSInteger theColumnCount = [statement columnCount:&theError];
         if (theColumnCount < 0)
             return(NULL);
         NSMutableArray *theRow = [NSMutableArray arrayWithCapacity:theColumnCount];
-        for (int N = 0; N != theColumnCount; ++N)
+        for (NSInteger N = 0; N != theColumnCount; ++N)
             {
-            id theValue = [statement columnValueAtIndex:N error:NULL];
+            id theValue = [statement columnValueAtIndex:N error:&theError];
+            if (theError != NULL)
+                {
+                self = NULL;
+                return(NULL);
+                }
             [theRow addObject:theValue];
             }
         allValues = [theRow copy];
-        
         }
     return self;
     }
@@ -53,10 +59,16 @@
     return([[self asDictionary] description]);
     }
 
+- (id)valueForKey:(NSString *)aKey
+    {
+    return([self objectForKey:aKey]);
+    }
 
 - (id)objectForKey:(id)aKey
     {
-    return([self.statement columnValueForName:aKey error:NULL]);
+    NSInteger theIndex = [self.statement.columnNames indexOfObject:aKey];
+    
+    return([self.allValues objectAtIndex:theIndex]);
     }
     
 - (NSArray *)allKeys

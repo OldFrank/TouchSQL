@@ -50,6 +50,9 @@
 
 - (id)nextObject
     {
+    if (self.statement.done == YES)
+        return(NULL);
+    [self.statement step:NULL];
 	return([self.statement row:NULL]);
     }
 

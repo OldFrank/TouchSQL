@@ -107,13 +107,13 @@ static void word_search_func(sqlite3_context* ctx, int argc, sqlite3_value** arg
     
     // Borrow the buffer here
     const unsigned char *s1 = sqlite3_value_text(argv[0]);
-    NSString *string1 = [[NSString alloc] initWithBytesNoCopy:(void *)s1 length:sqlite3_value_bytes(argv[0]) encoding:NSUTF8StringEncoding freeWhenDone:NO];
+    NSString *string1 = [[NSString alloc] initWithBytesNoCopy:(void *)s1 length:(NSInteger)sqlite3_value_bytes(argv[0]) encoding:NSUTF8StringEncoding freeWhenDone:NO];
     
     // Prepare to be searched!
-    int curLoc = 0;
-    int maxLoc = [string1 length];
+    NSInteger curLoc = 0;
+    NSInteger maxLoc = [string1 length];
     
-    int string2Len = [string2 length];
+    NSUInteger string2Len = [string2 length];
     while (curLoc < maxLoc)
     {
         NSRange searchRange = NSMakeRange(curLoc, maxLoc - curLoc);

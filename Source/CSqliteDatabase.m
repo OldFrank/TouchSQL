@@ -38,139 +38,191 @@
 NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
 
 @interface CSqliteDatabase ()
-@property (readwrite, nonatomic, strong) NSString *path;
 @property (readwrite, nonatomic, assign) sqlite3 *sql;
-@property (readwrite, nonatomic, strong) NSMutableDictionary *userDictionary;
+@property (readwrite, nonatomic, strong) CSqliteStatement *beginTransactionStatement;
+@property (readwrite, nonatomic, strong) CSqliteStatement *commitStatement;
+@property (readwrite, nonatomic, strong) CSqliteStatement *rollbackStatement;
 @end
 
 @implementation CSqliteDatabase
 
-@synthesize path;
+@synthesize URL;
 @synthesize sql;
-@synthesize userDictionary;
 
-- (id)initWithPath:(NSString *)inPath
-{
-if (self = ([self init]))
+@synthesize beginTransactionStatement;
+@synthesize commitStatement;
+@synthesize rollbackStatement;
+
+- (id)initWithSqlite3:(sqlite3 *)inSqlite3
     {
-    path = inPath;
+    if ((self = [super init]) != NULL)
+        {
+        sql = inSqlite3;
+        }
+    return self;
     }
-return(self);
-}
 
-- (id)initInMemory;
-{
-return([self initWithPath:@":memory:"]);
-}
+- (id)initWithURL:(NSURL *)inURL flags:(int)inFlags error:(NSError **)outError;
+    {
+    NSString *thePath = NULL;
+    
+    #if SQLITE_VERSION_NUMBER >= 3007007
+    if (sqlite3_libversion_number() >= 3007007)
+        {
+        thePath = [inURL absoluteString];
+        inFlags |= SQLITE_OPEN_URI;
+        }
+    #endif
+
+    if (thePath == NULL)
+        {
+        if ([inURL isFileURL] == NO)
+            {
+            if (outError)
+                {
+                *outError = [NSError errorWithDomain:TouchSQLErrorDomain code:-1 userInfo:NULL];
+                }
+            self = NULL;
+            return(NULL);
+            }
+        
+        thePath = [inURL path];
+        }
+    
+    
+    sqlite3 *theSql = NULL;
+    int theResult = sqlite3_open_v2([thePath UTF8String], &theSql, inFlags, NULL);
+    if (theSql == NULL || theResult != SQLITE_OK)
+        {
+        if (outError)
+            {
+            *outError = [NSError errorWithDomain:TouchSQLErrorDomain code:theResult userInfo:NULL];
+            }
+        self = NULL;
+        return(NULL);
+        }
+
+    if (self = ([self initWithSqlite3:theSql]))
+        {
+        URL = inURL;
+        }
+    return(self);
+    }
+
+- (id)initWithURL:(NSURL *)inURL error:(NSError **)outError;
+    {
+    return([self initWithURL:inURL flags:SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE error:outError]);
+    }
+
+- (id)initInMemory:(NSError **)outError
+    {
+    sqlite3 *theSql = NULL;
+    int theResult = sqlite3_open(":memory:", &theSql);
+    if (theSql == NULL)
+        {
+        if (outError)
+            {
+            *outError = [NSError errorWithDomain:TouchSQLErrorDomain code:theResult userInfo:NULL];
+            }
+        self = NULL;
+        return(NULL);
+        }
+    
+    return([self initWithSqlite3:theSql]);
+    }
+    
+- (id)initTemporary:(NSError **)outError;
+    {
+    NSString *theTemporaryDirectory = NSTemporaryDirectory();
+    NSString *theTemplate = [theTemporaryDirectory stringByAppendingFormat:@"sqlite_XXXXXXXX"];
+    
+    char *theBuffer = alloca(strlen([theTemplate UTF8String]) + 1);
+    strcpy(theBuffer, [theTemplate UTF8String]);
+    
+    char *S = mktemp(theBuffer);
+    
+    NSString *theTemporaryPath = [NSString stringWithUTF8String:S];
+    
+    return([self initWithURL:[NSURL fileURLWithPath:theTemporaryPath] error:outError]);
+    }
 
 - (void)dealloc
-{
-[self close];
-}
+    {
+    if (sql)
+        {
+        if (sqlite3_close(sql) == SQLITE_BUSY)
+            {
+            NSLog(@"sqlite3_close() failed with SQLITE_BUSY!");
+            }
+        sql = NULL;
+        }
+    }
 
 #pragma mark -
 
-- (BOOL)open:(NSError **)outError
-{
-if (sql == NULL)
+- (NSString *)description
     {
-    sqlite3 *theSql = NULL;
-    int theResult = sqlite3_open([self.path UTF8String], &theSql);
-    if (theResult != SQLITE_OK)
+    return([NSString stringWithFormat:@"%@ (%s, %@)", [super description], sqlite3_libversion(), self.URL]);
+    }
+
+#pragma mark -
+
+- (CSqliteStatement *)beginTransactionStatement
+    {
+    if (beginTransactionStatement == NULL)
         {
-        if (outError)
-            *outError = [NSError errorWithDomain:TouchSQLErrorDomain code:theResult userInfo:NULL];
-        return(NO);
+        beginTransactionStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"BEGIN TRANSACTION"];
         }
-    self.sql = theSql;
+    return(beginTransactionStatement);
     }
-return(YES);
-}
 
-- (void)close
-{
-if (self.sql)
+- (CSqliteStatement *)commitStatement
     {
-    if (sqlite3_close(self.sql) == SQLITE_BUSY)
+    if (commitStatement == NULL)
         {
-        NSLog(@"sqlite3_close() failed with SQLITE_BUSY!");
+        commitStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"COMMIT"];
         }
-    self.sql = NULL;
+    return(commitStatement);
     }
-}
 
-- (void)setSql:(sqlite3 *)inSql
-{
-if (sql != inSql)
+- (CSqliteStatement *)rollbackStatement
     {
-    if (sql != NULL)
+    if (rollbackStatement == NULL)
         {
-        if (sqlite3_close(sql) == SQLITE_BUSY)
-            NSLog(@"sqlite3_close() failed with SQLITE_BUSY!");
-        sql = NULL;
+        rollbackStatement = [[CSqliteStatement alloc] init];
         }
-    sql = inSql;
+    return(rollbackStatement);
     }
-}
-
-
-- (NSMutableDictionary *)userDictionary
-{
-if (userDictionary == NULL)
-    {
-    userDictionary = [[NSMutableDictionary alloc] init];
-    }
-return(userDictionary);
-}
 
 #pragma mark -
 
 - (BOOL)begin
-{
-CSqliteStatement *theStatement = [self.userDictionary objectForKey:@"BEGIN TRANSACTION"];
-if (theStatement == NULL)
-	{
-	theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"BEGIN TRANSACTION"];
-	[self.userDictionary setObject:theStatement forKey:@"BEGIN TRANSACTION"];
-	}
-return([theStatement execute:NULL]);
-}
+    {
+    return([self.beginTransactionStatement execute:NULL]);
+    }
 
 - (BOOL)commit
-{
-CSqliteStatement *theStatement = [self.userDictionary objectForKey:@"COMMIT"];
-if (theStatement == NULL)
-	{
-	theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"COMMIT"];
-	[self.userDictionary setObject:theStatement forKey:@"COMMIT"];
-	}
-return([theStatement execute:NULL]);
-}
+    {
+    return([self.commitStatement execute:NULL]);
+    }
 
 - (BOOL)rollback
-{
-CSqliteStatement *theStatement = [self.userDictionary objectForKey:@"ROLLBACK"];
-if (theStatement == NULL)
-	{
-	theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:@"ROLLBACK"];
-	[self.userDictionary setObject:theStatement forKey:@"ROLLBACK"];
-	}
-return([theStatement execute:NULL]);
-}
-
+    {
+    return([self.rollbackStatement execute:NULL]);
+    }
 
 - (NSInteger)lastInsertRowID
-{
-// TODO 64 bit!??!?!?!
-sqlite_int64 theLastRowID = sqlite3_last_insert_rowid(self.sql);
-return(theLastRowID);
-}
+    {
+    // TODO 64 bit!??!?!?!
+    sqlite_int64 theLastRowID = sqlite3_last_insert_rowid(self.sql);
+    return(theLastRowID);
+    }
 
 - (NSError *)currentError
-{
-NSString *theErrorString = [NSString stringWithUTF8String:sqlite3_errmsg(self.sql)];
-NSError *theError = [NSError errorWithDomain:TouchSQLErrorDomain code:sqlite3_errcode(self.sql) userInfo:[NSDictionary dictionaryWithObject:theErrorString forKey:NSLocalizedDescriptionKey]];
-return(theError);
-}
+    {
+    NSString *theErrorString = [NSString stringWithUTF8String:sqlite3_errmsg(self.sql)];
+    NSError *theError = [NSError errorWithDomain:TouchSQLErrorDomain code:sqlite3_errcode(self.sql) userInfo:[NSDictionary dictionaryWithObject:theErrorString forKey:NSLocalizedDescriptionKey]];
+    return(theError);
+    }
 
 @end

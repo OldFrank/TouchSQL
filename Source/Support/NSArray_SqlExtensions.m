@@ -35,7 +35,7 @@
 {
 // ### Note I'm doing a certain amount of optimisation here which is why the code is a little bit fuggly (e.g. I'm avoiding NSEnumerators and trying not to create too many temporary objects).
 NSMutableString *theString = [NSMutableString stringWithCapacity:512];
-unsigned theCount = [self count];
+NSInteger theCount = [self count];
 //
 for (unsigned N = 0; N != theCount; ++N)
 	{
@@ -54,7 +54,7 @@ for (unsigned N = 0; N != theCount; ++N)
 		else
 			{
 			[theString appendString:@"'"];
-			unsigned theStringLength = [theString length];
+			NSInteger theStringLength = [theString length];
 			[theString appendString:theTrimmedString];
 			[theString replaceOccurrencesOfString:@"\'" withString:@"\'\'" options:NSLiteralSearch range:NSMakeRange(theStringLength, [theTrimmedString length])];
 			[theString appendString:@"'"];
