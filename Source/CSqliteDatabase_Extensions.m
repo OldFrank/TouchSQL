@@ -33,6 +33,36 @@
 
 @implementation CSqliteDatabase (CSqliteDatabase_Extensions)
 
+- (BOOL)executeExpression:(NSString *)inExpression error:(NSError **)outError
+{
+NSAssert(self.sql != NULL, @"Database not open.");
+
+int theResult = sqlite3_exec(self.sql, [inExpression UTF8String], NULL, NULL, NULL);
+if (theResult != SQLITE_OK)
+	{
+	if (outError)
+        {
+		*outError = [self currentError];
+        }
+	}
+
+return(theResult == SQLITE_OK ? YES : NO);
+}
+
+- (NSEnumerator *)enumeratorForExpression:(NSString *)inExpression error:(NSError **)outError
+{
+#pragma unused (outError)
+CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
+return([theStatement enumerator]);
+}
+
+- (NSArray *)rowsForExpression:(NSString *)inExpression error:(NSError **)outError
+{
+CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
+return([theStatement rows:outError]);
+}
+
+
 // TODO -- most of these methods can be heavily optimised and more error checking added (search for NULL)
 
 - (NSDictionary *)rowForExpression:(NSString *)inExpression error:(NSError **)outError

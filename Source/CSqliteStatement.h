@@ -32,6 +32,7 @@
 #include <sqlite3.h>
 
 @class CSqliteDatabase;
+@class CSqliteRow;
 
 @interface CSqliteStatement : NSObject <NSFastEnumeration> {
 }
@@ -39,6 +40,7 @@
 @property (readonly, nonatomic, weak) CSqliteDatabase *database;
 @property (readonly, nonatomic, copy) NSString *statementString;
 @property (readonly, nonatomic, assign) sqlite3_stmt *statement;
+@property (readonly, nonatomic, strong) NSArray *columnNames;
 
 + (CSqliteStatement *)statementWithDatabase:(CSqliteDatabase *)inDatabase format:(NSString *)inFormat, ...;
 
@@ -57,17 +59,16 @@
 - (BOOL)step:(NSError **)outError;
 
 - (NSInteger)columnCount:(NSError **)outError;
-- (NSString *)columnNameAtIndex:(NSInteger)inIndex error:(NSError **)outError;
-- (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError;
 
+- (NSString *)columnNameAtIndex:(NSInteger)inIndex error:(NSError **)outError;
 - (NSArray *)columnNames:(NSError **)outError;
 
-- (NSArray *)row:(NSError **)outError;
-- (NSDictionary *)rowDictionary:(NSError **)outError;
+- (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError;
+- (id)columnValueForName:(NSString *)inName error:(NSError **)outError;
 
-- (NSArray *)rows:(NSError **)outError;
-- (NSArray *)rowDictionaries:(NSError **)outError;
 
 - (NSEnumerator *)enumerator;
+- (CSqliteRow *)row:(NSError **)outError;
+- (NSArray *)rows:(NSError **)outError;
 
 @end

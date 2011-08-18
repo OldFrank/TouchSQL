@@ -46,3 +46,4 @@
 #import "NSArray_SqlExtensions.h"
 #import "NSDate_SqlExtension.h"
 #import "NSString_SqlExtensions.h"
+#import "CSqliteRow.h"

@@ -32,6 +32,7 @@
 #import "CSqliteDatabase.h"
 #import "CSqliteDatabase_Extensions.h"
 #import "CSqliteEnumerator.h"
+#import "CSqliteRow.h"
 
 @interface CSqliteStatement ()
 @property (readwrite, nonatomic, assign) CSqliteDatabase *database;
@@ -44,6 +45,7 @@
 @synthesize database;
 @synthesize statementString;
 @synthesize statement;
+@synthesize columnNames;
 
 + (CSqliteStatement *)statementWithDatabase:(CSqliteDatabase *)inDatabase format:(NSString *)inFormat, ...;
 {
@@ -97,6 +99,15 @@ if (statement != inStatement)
     }
 }
 
+- (NSArray *)columnNames
+    {
+    if (columnNames == NULL)
+        {
+        columnNames = [self columnNames:NULL];
+        }
+    return(columnNames);
+    }
+
 #pragma mark -
 
 - (BOOL)prepare:(NSError **)outError;
@@ -115,7 +126,7 @@ if (statement != NULL)
 sqlite3_stmt *theStatement = NULL;
 const char *theTail = NULL;
 
-int theResult = sqlite3_prepare_v2(self.database.sql, [self.statementString UTF8String], [self.statementString length], &theStatement, &theTail);
+int theResult = sqlite3_prepare_v2(self.database.sql, [self.statementString UTF8String], (int)[self.statementString length], &theStatement, &theTail);
 if (theResult != SQLITE_OK)
 	{
 	if (outError)
@@ -168,7 +179,7 @@ BOOL theResult;
 if ([inValue isKindOfClass:[NSData class]])
 	{
 	NSData *theData = (NSData *)inValue;
-	theResult = sqlite3_bind_blob(self.statement, theParameterIndex, theData.bytes, theData.length, theDestructorType);
+	theResult = sqlite3_bind_blob(self.statement, theParameterIndex, theData.bytes, (int)theData.length, theDestructorType);
 	}
 else if ([inValue isKindOfClass:[NSNumber class]])
 	{
@@ -205,7 +216,7 @@ else if (inValue == [NSNull null])
 else if ([inValue isKindOfClass:[NSString class]])
 	{
 	NSString *theString = (NSString *)inValue;
-	theResult = sqlite3_bind_text(self.statement, theParameterIndex, [theString UTF8String], theString.length, theDestructorType);
+	theResult = sqlite3_bind_text(self.statement, theParameterIndex, [theString UTF8String], (int)theString.length, theDestructorType);
 	}
 else
 	{
@@ -272,7 +283,7 @@ return(theColumnCount);
 
 - (NSString *)columnNameAtIndex:(NSInteger)inIndex error:(NSError **)outError
 {
-const char *theName = sqlite3_column_name(self.statement, inIndex);
+const char *theName = sqlite3_column_name(self.statement, (int)inIndex);
 if (theName == NULL)
 	{
 	if (outError)
@@ -282,51 +293,10 @@ if (theName == NULL)
 return([NSString stringWithUTF8String:theName]);
 }
 
-- (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError
-{
-int theColumnType = sqlite3_column_type(self.statement, inIndex);
-id theValue = NULL;
-switch (theColumnType)
-	{
-	case SQLITE_INTEGER:
-		{
-		sqlite_int64 theInt64 = sqlite3_column_int64(self.statement, inIndex);
-		theValue = [NSNumber numberWithLongLong:theInt64];
-		}
-		break;
-	case SQLITE_FLOAT:
-		{
-		double theDouble = sqlite3_column_double(self.statement, inIndex);
-		theValue = [NSNumber numberWithDouble:theDouble];
-		}
-		break;
-	case SQLITE_BLOB:
-		{
-		const void *theBytes = sqlite3_column_blob(self.statement, inIndex);
-		int theLength = sqlite3_column_bytes(self.statement, inIndex);
-		theValue = [NSData dataWithBytes:theBytes length:theLength];
-		}
-		break;
-	case SQLITE_NULL:
-		{
-		theValue = [NSNull null];
-		}
-		break;
-	case SQLITE_TEXT:
-		{
-		const unsigned char *theText = sqlite3_column_text(self.statement, inIndex);
-		theValue = [NSString stringWithUTF8String:(const char *)theText];
-		}
-		break;
-	default:
-		break;
-	}
-return(theValue);
-}
 
 - (NSArray *)columnNames:(NSError **)outError;
 {
-int theColumnCount = [self columnCount:outError];
+int theColumnCount = (int)[self columnCount:outError];
 if (theColumnCount < 0)
 	return(NULL);
 NSMutableArray *theColumnNames = [NSMutableArray arrayWithCapacity:theColumnCount];
@@ -338,69 +308,79 @@ for (int N = 0; N != theColumnCount; ++N)
 return(theColumnNames);
 }
 
-- (NSArray *)row:(NSError **)outError;
-{
-if ([self step:outError] == NO)
-	return(NULL);
 
-int theColumnCount = [self columnCount:outError];
-if (theColumnCount < 0)
-	return(NULL);
-NSMutableArray *theRow = [NSMutableArray arrayWithCapacity:theColumnCount];
-for (int N = 0; N != theColumnCount; ++N)
+- (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError
+{
+int theColumnType = sqlite3_column_type(self.statement, (int)inIndex);
+id theValue = NULL;
+switch (theColumnType)
 	{
-	id theValue = [self columnValueAtIndex:N error:outError];
-	[theRow addObject:theValue];
+	case SQLITE_INTEGER:
+		{
+		sqlite_int64 theInt64 = sqlite3_column_int64(self.statement, (int)inIndex);
+		theValue = [NSNumber numberWithLongLong:theInt64];
+		}
+		break;
+	case SQLITE_FLOAT:
+		{
+		double theDouble = sqlite3_column_double(self.statement, (int)inIndex);
+		theValue = [NSNumber numberWithDouble:theDouble];
+		}
+		break;
+	case SQLITE_BLOB:
+		{
+		const void *theBytes = sqlite3_column_blob(self.statement, (int)inIndex);
+		int theLength = sqlite3_column_bytes(self.statement, (int)inIndex);
+		theValue = [NSData dataWithBytes:theBytes length:theLength];
+		}
+		break;
+	case SQLITE_NULL:
+		{
+		theValue = [NSNull null];
+		}
+		break;
+	case SQLITE_TEXT:
+		{
+		const unsigned char *theText = sqlite3_column_text(self.statement, (int)inIndex);
+		theValue = [NSString stringWithUTF8String:(const char *)theText];
+		}
+		break;
+	default:
+		break;
 	}
-return(theRow);
+return(theValue);
 }
 
-- (NSDictionary *)rowDictionary:(NSError **)outError
-{
-if ([self step:outError] == NO)
-	return(NULL);
+- (id)columnValueForName:(NSString *)inName error:(NSError **)outError;
+    {
+    NSUInteger theIndex = [self.columnNames indexOfObject:inName];
+    return([self columnValueAtIndex:theIndex error:outError]);
+    }
 
-int theColumnCount = [self columnCount:outError];
-if (theColumnCount < 0)
-	return(NULL);
-NSMutableDictionary *theRow = [NSMutableDictionary dictionaryWithCapacity:theColumnCount];
-for (int N = 0; N != theColumnCount; ++N)
-	{
-	NSString *theColumnName = [self columnNameAtIndex:N error:outError];
-	id theValue = [self columnValueAtIndex:N error:outError];
-
-	[theRow setObject:theValue forKey:theColumnName];
-	}
-return(theRow);
-}
-
-- (NSArray *)rows:(NSError **)outError
-{
-#pragma unused (outError)
-
-NSMutableArray *theRows = [NSMutableArray array];
-for (NSArray *theRow in self)
-	{
-	[theRows addObject:theRow];
-	}
-return(theRows);
-}
-
-- (NSArray *)rowDictionaries:(NSError **)outError
-{
-#pragma unused (outError)
-
-NSArray *theColumnNames = [self columnNames:outError];
-NSMutableArray *theRowDictionaries = [NSMutableArray array];
-for (NSArray *theRow in self)
-	{
-	NSDictionary *theDictionary = [NSDictionary dictionaryWithObjects:theRow forKeys:theColumnNames];
-	[theRowDictionaries addObject:theDictionary];
-	}
-return(theRowDictionaries);
-}
 
 #pragma mark -
+
+- (NSEnumerator *)enumerator
+{
+return([[CSqliteEnumerator alloc] initWithStatement:self]);
+}
+
+- (CSqliteRow *)row:(NSError **)outError;
+    {
+    CSqliteRow *theRow = [[CSqliteRow alloc] initWithStatement:self];
+    return(theRow);
+    }
+
+- (NSArray *)rows:(NSError **)outError
+    {
+    NSMutableArray *theRows = [NSMutableArray array];
+    for (CSqliteRow *theRow in self)
+        {
+        [theRows addObject:theRow];
+        }
+    return(theRows);
+    }
+
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])stackbuf count:(NSUInteger)len;
 {
@@ -416,18 +396,20 @@ NSError *theError = NULL;
 
 while (theObjectCount < len && [self step:&theError] == YES)
 	{
-	NSArray *theRow = [self row:&theError];
-	stackbuf[theObjectCount++] = theRow;
+	id theRow = [self row:NULL];
+    if (theRow)
+        {
+        stackbuf[theObjectCount++] = theRow;
+        }
+    else
+        {
+        break;
+        }
 	}
 
 state->itemsPtr = stackbuf;
 
 return(theObjectCount);
-}
-
-- (NSEnumerator *)enumerator
-{
-return([[CSqliteEnumerator alloc] initWithStatement:self]);
 }
 
 @end

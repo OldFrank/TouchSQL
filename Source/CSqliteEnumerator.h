@@ -34,7 +34,6 @@
 @interface CSqliteEnumerator : NSEnumerator {
 }
 
-- (id)initWithStatement:(CSqliteStatement *)inStatement resultsAsDictionary:(BOOL)inResultsAsDictionary;
 - (id)initWithStatement:(CSqliteStatement *)inStatement;
 
 @end

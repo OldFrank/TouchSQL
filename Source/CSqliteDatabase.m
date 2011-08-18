@@ -32,7 +32,6 @@
 #include <sqlite3.h>
 
 #import "CSqliteStatement.h"
-
 #import "CSqliteEnumerator.h"
 #import "CSqliteDatabase_Extensions.h"
 
@@ -159,112 +158,6 @@ if (theStatement == NULL)
 return([theStatement execute:NULL]);
 }
 
-- (BOOL)executeExpression:(NSString *)inExpression error:(NSError **)outError
-{
-NSAssert(self.sql != NULL, @"Database not open.");
-
-int theResult = sqlite3_exec(self.sql, [inExpression UTF8String], NULL, NULL, NULL);
-if (theResult != SQLITE_OK)
-	{
-	if (outError)
-        {
-		*outError = [self currentError];
-        }
-	}
-
-return(theResult == SQLITE_OK ? YES : NO);
-}
-
-- (NSEnumerator *)enumeratorForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-#pragma unused (outError)
-CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
-return([theStatement enumerator]);
-}
-
-- (NSArray *)rowsForExpression:(NSString *)inExpression error:(NSError **)outError
-{
-NSAssert(self.sql != NULL, @"Database not open.");
-int theColumnCount = 0;
-int cColumnType = 0;
-NSInteger cColumnIntegerVal;
-NSMutableDictionary *cRowDict = nil;
-double cColumnDoubleVal;
-const unsigned char *cColumnCStrVal;
-const void *cColumnBlobVal;
-int cColumnBlobValLen;
-id cBoxedColumnValue = nil;
-const char* cColumnName;
-sqlite3_stmt *pStmt = NULL;
-const char *tail = NULL;
-
-int theResult = sqlite3_prepare_v2(self.sql, [inExpression UTF8String], -1, &pStmt, &tail);
-
-if (theResult != SQLITE_OK)
-	{
-	if (outError)
-        {
-		*outError = [self currentError];
-        }
-	return(NULL);
-	}
-//
-
-NSMutableArray *theRowsArray = [NSMutableArray array];
-theColumnCount = sqlite3_column_count(pStmt);
-while ((theResult = sqlite3_step(pStmt)) == SQLITE_ROW)
-    {
-    // Read the next row
-    cRowDict = [NSMutableDictionary dictionaryWithCapacity:theColumnCount];
-
-    for (int theColumn = 0; theColumn < theColumnCount; ++theColumn)
-        {
-            cColumnType = sqlite3_column_type(pStmt, theColumn);
-            cColumnName = sqlite3_column_name(pStmt, theColumn);
-
-            switch(cColumnType)
-                {
-                case SQLITE_INTEGER:
-                    cColumnIntegerVal = sqlite3_column_int(pStmt, theColumn);
-                    cBoxedColumnValue = [NSNumber numberWithInteger:cColumnIntegerVal];
-                    break;
-                case SQLITE_FLOAT:
-                    cColumnDoubleVal = sqlite3_column_double(pStmt, theColumn);
-                    cBoxedColumnValue = [NSNumber numberWithDouble:cColumnDoubleVal];
-                    break;
-                case SQLITE_BLOB:
-                    cColumnBlobVal = sqlite3_column_blob(pStmt, theColumn);
-                    cColumnBlobValLen = sqlite3_column_bytes(pStmt, theColumn);
-                    cBoxedColumnValue = [NSData dataWithBytes:cColumnBlobVal length:cColumnBlobValLen];
-                    break;
-                case SQLITE_NULL:
-                    cBoxedColumnValue = [NSNull null];
-                    break;
-                case SQLITE_TEXT:
-                    cColumnCStrVal = sqlite3_column_text(pStmt, theColumn);
-                    cBoxedColumnValue = [NSString stringWithUTF8String:(const char *)cColumnCStrVal];
-                    break;
-                }
-
-            [cRowDict setObject:cBoxedColumnValue forKey:[NSString stringWithUTF8String:cColumnName]];
-        }
-
-    [theRowsArray addObject:cRowDict];
-    }
-
-if ( (theResult != SQLITE_OK) && (theResult != SQLITE_DONE) )
-    {
-    if (outError)
-        {
-		*outError = [self currentError];
-        }
-    }
-
-sqlite3_finalize(pStmt);
-pStmt = NULL;
-
-return(theRowsArray);
-}
 
 - (NSInteger)lastInsertRowID
 {

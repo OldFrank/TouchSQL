@@ -30,42 +30,27 @@
 #import "CSqliteEnumerator.h"
 
 @interface CSqliteEnumerator ()
-@property (readwrite, strong) CSqliteStatement *statement;
-@property (readwrite, assign) BOOL resultsAsDictionary;
+@property (readonly, nonatomic, strong) CSqliteStatement *statement;
 @end
 
 @implementation CSqliteEnumerator
 
 @synthesize statement;
-@synthesize resultsAsDictionary;
-
-- (id)initWithStatement:(CSqliteStatement *)inStatement resultsAsDictionary:(BOOL)inResultsAsDictionary;
-{
-if ((self = [self init]) != NULL)
-	{
-	self.statement = inStatement;
-	self.resultsAsDictionary = inResultsAsDictionary;
-	}
-return(self);
-}
 
 - (id)initWithStatement:(CSqliteStatement *)inStatement
-{
-return([self initWithStatement:inStatement resultsAsDictionary:YES]);
-}
-
+    {
+    if ((self = [super init]) != NULL)
+        {
+        statement = inStatement;
+        }
+    return self;
+    }
 
 #pragma mark -
 
 - (id)nextObject
-{
-if (self.resultsAsDictionary)
-	{
-	NSDictionary *theDictionary = [self.statement rowDictionary:NULL];
-	return(theDictionary);
-	}
-else
+    {
 	return([self.statement row:NULL]);
-}
+    }
 
 @end

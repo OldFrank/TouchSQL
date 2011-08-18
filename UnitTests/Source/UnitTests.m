@@ -65,7 +65,7 @@
 	NSArray *rows = [db rowsForExpression:@"SELECT * FROM foo WHERE 1" error:&err];
 	STAssertNil(err, @"Should be able to select from database");
 	
-	NSDictionary *row = [rows objectAtIndex:0];
+	CSqliteRow *row = [rows objectAtIndex:0];
 	STAssertNotNil(row, @"Should be able to get a row from the database");
 	STAssertEqualObjects([row objectForKey:@"name"], @"testname", @"Should be able to select inserted data");
 	
