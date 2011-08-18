@@ -54,4 +54,6 @@ extern NSString *TouchSQLErrorDomain /* = @"TouchSQLErrorDomain" */;
 - (NSInteger)lastInsertRowID;
 - (NSError *)currentError;
 
+- (CSqliteStatement *)statementWithString:(NSString *)inString;
+
 @end

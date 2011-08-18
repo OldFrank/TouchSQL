@@ -102,6 +102,16 @@
 
 #pragma mark -
 
+- (BOOL)finalize:(NSError **)outError;
+    {
+    if (statement != NULL)
+        {
+        sqlite3_finalize(statement);
+        statement = NULL;
+        }
+    return(YES);
+    }
+
 - (BOOL)prepare:(NSError **)outError;
     {
     if (statement != NULL)

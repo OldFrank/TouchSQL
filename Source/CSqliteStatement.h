@@ -46,6 +46,7 @@
 - (id)initWithDatabase:(CSqliteDatabase *)inDatabase string:(NSString *)inString;
 
 - (BOOL)prepare:(NSError **)outError;
+- (BOOL)finalize:(NSError **)outError;
 - (BOOL)step:(NSError **)outError;
 - (BOOL)execute:(NSError **)outError;
 - (BOOL)reset:(NSError **)outError;

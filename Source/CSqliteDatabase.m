@@ -38,7 +38,7 @@
 NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
 
 @interface CSqliteDatabase ()
-@property (readwrite, nonatomic, assign) sqlite3 *sql;
+@property (readwrite, nonatomic, strong) NSMutableSet *activeStatements;
 @property (readwrite, nonatomic, strong) CSqliteStatement *beginTransactionStatement;
 @property (readwrite, nonatomic, strong) CSqliteStatement *commitStatement;
 @property (readwrite, nonatomic, strong) CSqliteStatement *rollbackStatement;
@@ -49,6 +49,7 @@ NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
 @synthesize URL;
 @synthesize sql;
 
+@synthesize activeStatements;
 @synthesize beginTransactionStatement;
 @synthesize commitStatement;
 @synthesize rollbackStatement;
@@ -58,6 +59,7 @@ NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
     if ((self = [super init]) != NULL)
         {
         sql = inSqlite3;
+        activeStatements = [[NSMutableSet alloc] init];
         }
     return self;
     }
@@ -148,6 +150,11 @@ NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
 
 - (void)dealloc
     {
+    for (CSqliteStatement *theStatement in activeStatements)
+        {
+        [theStatement finalize:NULL];
+        }
+    
     if (sql)
         {
         if (sqlite3_close(sql) == SQLITE_BUSY)
@@ -223,6 +230,16 @@ NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
     NSString *theErrorString = [NSString stringWithUTF8String:sqlite3_errmsg(self.sql)];
     NSError *theError = [NSError errorWithDomain:TouchSQLErrorDomain code:sqlite3_errcode(self.sql) userInfo:[NSDictionary dictionaryWithObject:theErrorString forKey:NSLocalizedDescriptionKey]];
     return(theError);
+    }
+    
+#pragma mark -
+
+- (CSqliteStatement *)statementWithString:(NSString *)inString;
+    {
+    // BUG -- the ativeStatements keeps building up and up and never shrinks. Only cleaned up with DB dealloc-ed.
+    CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inString];
+    [self.activeStatements addObject:theStatement];
+    return(theStatement);
     }
 
 @end

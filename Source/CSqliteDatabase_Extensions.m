@@ -30,51 +30,38 @@
 #import "CSqliteDatabase_Extensions.h"
 
 #import "CSqliteStatement.h"
+#import "CSqliteRow.h"
 
 @implementation CSqliteDatabase (CSqliteDatabase_Extensions)
 
 - (BOOL)executeExpression:(NSString *)inExpression error:(NSError **)outError
     {
-    NSAssert(self.sql != NULL, @"Database not open.");
-
-    int theResult = sqlite3_exec(self.sql, [inExpression UTF8String], NULL, NULL, NULL);
-    if (theResult != SQLITE_OK)
-        {
-        if (outError)
-            {
-            *outError = [self currentError];
-            }
-        }
-
-    return(theResult == SQLITE_OK ? YES : NO);
+    CSqliteStatement *theStatement = [self statementWithString:inExpression];
+    return([theStatement execute:outError]);
     }
 
 - (NSEnumerator *)enumeratorForExpression:(NSString *)inExpression error:(NSError **)outError
     {
-    #pragma unused (outError)
-    CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
+    CSqliteStatement *theStatement = [self statementWithString:inExpression];
     return([theStatement enumerator]);
     }
 
 - (NSArray *)rowsForExpression:(NSString *)inExpression error:(NSError **)outError
     {
-    CSqliteStatement *theStatement = [[CSqliteStatement alloc] initWithDatabase:self string:inExpression];
+    CSqliteStatement *theStatement = [self statementWithString:inExpression];
     return([theStatement rows:outError]);
     }
 
-
-- (NSDictionary *)rowForExpression:(NSString *)inExpression error:(NSError **)outError
+- (CSqliteRow *)rowForExpression:(NSString *)inExpression error:(NSError **)outError
     {
-    NSArray *theRows = [self rowsForExpression:inExpression error:outError];
-    if ([theRows count] > 0)
-        return([theRows objectAtIndex:0]);
-    else
-        return(NULL);
+    CSqliteStatement *theStatement = [self statementWithString:inExpression];
+    CSqliteRow *theRow = [theStatement row:outError];
+    return(theRow);
     }
 
 - (NSArray *)valuesForExpression:(NSString *)inExpression error:(NSError **)outError
     {
-    NSDictionary *theRow = [self rowForExpression:inExpression error:outError];
+    CSqliteRow *theRow = [self rowForExpression:inExpression error:outError];
     return([theRow allValues]);
     }
 

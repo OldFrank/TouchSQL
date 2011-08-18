@@ -29,13 +29,15 @@
 
 #import "CSqliteDatabase.h"
 
+@class CSqliteRow;
+
 @interface CSqliteDatabase (CSqliteDatabase_Extensions)
 
 - (BOOL)executeExpression:(NSString *)inExpression error:(NSError **)outError;
 - (NSEnumerator *)enumeratorForExpression:(NSString *)inExpression error:(NSError **)outError;
 - (NSArray *)rowsForExpression:(NSString *)inExpression error:(NSError **)outError;
 
-- (NSDictionary *)rowForExpression:(NSString *)inExpression error:(NSError **)outError;
+- (CSqliteRow *)rowForExpression:(NSString *)inExpression error:(NSError **)outError;
 
 - (NSArray *)valuesForExpression:(NSString *)inExpression error:(NSError **)outError;
 

@@ -38,21 +38,24 @@ int main(int argc, char **argv)
         CSqliteDatabase *theDatabase = [[CSqliteDatabase alloc] initTemporary:&theError];
         NSLog(@"%@", theDatabase);
         
-        BOOL result;
-        result = [theDatabase executeExpression:@"create table foo (name varchar(100))" error:&theError];
+        BOOL theResult;
+        theResult = [theDatabase executeExpression:@"CREATE TABLE foo (name VARCHAR(100))" error:&theError];
         NSLog(@"Error: %@", theError);
-        NSLog(@"%d", result);
+        NSLog(@"%d", theResult);
         
-        result = [theDatabase executeExpression:@"INSERT INTO foo VALUES ('testname') " error:&theError];
+        theResult = [theDatabase executeExpression:@"INSERT INTO foo VALUES ('testname') " error:&theError];
         NSLog(@"Error: %@", theError);
-        NSLog(@"%d", result);
+        NSLog(@"%d", theResult);
         
-        NSArray *rows = [theDatabase rowsForExpression:@"SELECT * FROM foo WHERE 1" error:&theError];
+        CSqliteStatement *theStatement = [theDatabase statementWithString:@"SELECT * FROM foo WHERE 1"];
+        
         NSLog(@"Error: %@", theError);
-        NSLog(@"%@", rows);
-        
-        NSDictionary *row = [rows objectAtIndex:0];
-        NSLog(@"%@", row);
+        for (CSqliteRow *theRow in theStatement)
+            {
+            NSLog(@"%@", theRow);
+            }
+            
+        theStatement = NULL;
         }
     return(0);
     }
