@@ -55,6 +55,7 @@
 - (CSqliteRow *)rowForExpression:(NSString *)inExpression error:(NSError **)outError
     {
     CSqliteStatement *theStatement = [self statementWithString:inExpression];
+    [theStatement step:outError];
     CSqliteRow *theRow = [theStatement row:outError];
     return(theRow);
     }
