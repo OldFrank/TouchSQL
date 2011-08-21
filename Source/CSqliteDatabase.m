@@ -242,4 +242,16 @@ NSString *TouchSQLErrorDomain = @"TouchSQLErrorDomain";
     return(theStatement);
     }
 
+- (CSqliteStatement *)statementWithFormat:(NSString *)inFormat, ...;
+    {
+    va_list theArgs;
+    va_start(theArgs, inFormat);
+
+    NSString *theString = [[NSString alloc] initWithFormat:inFormat arguments:theArgs];
+
+    va_end(theArgs);
+
+    return ([self statementWithString:theString]);
+    }
+
 @end

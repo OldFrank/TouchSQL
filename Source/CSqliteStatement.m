@@ -57,6 +57,21 @@
     return(self);
     }
 
+- (id)initWithDatabase:(CSqliteDatabase *)inDatabase format:(NSString *)inFormat, ...;
+    {
+    va_list theArgs;
+    va_start(theArgs, inFormat);
+
+    NSString *theString = [[NSString alloc] initWithFormat:inFormat arguments:theArgs];
+
+    va_end(theArgs);
+
+    if ((self = [self initWithDatabase:inDatabase string:theString]) != NULL)
+        {
+        }
+    return(self);
+    }
+
 - (void)dealloc
     {
     if (statement != NULL)

@@ -44,6 +44,7 @@
 @property (readonly, nonatomic, assign) BOOL done;
 
 - (id)initWithDatabase:(CSqliteDatabase *)inDatabase string:(NSString *)inString;
+- (id)initWithDatabase:(CSqliteDatabase *)inDatabase format:(NSString *)inFormat, ...;
 
 - (BOOL)prepare:(NSError **)outError;
 - (BOOL)finalize:(NSError **)outError;
