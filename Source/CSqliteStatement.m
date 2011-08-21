@@ -428,6 +428,55 @@
 
     return(theObjectCount);
     }
+    
+#pragma mark -
+
+- (void)enumerateObjectsUsingBlock:(void (^)(CSqliteRow *row, NSUInteger idx, BOOL *stop))block
+    {
+    [self enumerateObjectsWithOptions:0 usingBlock:block];
+    }
+
+- (void)enumerateObjectsWithOptions:(NSEnumerationOptions)opts usingBlock:(void (^)(CSqliteRow *row, NSUInteger idx, BOOL *stop))block
+    {
+    NSParameterAssert(block != NULL);
+    NSParameterAssert((opts & NSEnumerationReverse) == 0);
+
+    NSError *theError = NULL;
+
+    if (opts & NSEnumerationConcurrent)
+        {
+        dispatch_group_t theGroup = dispatch_group_create();
+        dispatch_queue_t theQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        
+        __block BOOL theStopFlag = NO;
+        for (NSUInteger N = 0; theStopFlag == NO && [self step:&theError] == YES; N++)
+            {
+            CSqliteRow *theRow = [self row:&theError];
+            
+            dispatch_group_async(theGroup, theQueue, ^{
+                block(theRow, N, &theStopFlag);
+                });
+            }
+        
+        dispatch_group_wait(theGroup, DISPATCH_TIME_FOREVER);
+        
+        dispatch_release(theGroup);
+        }
+    else
+        {
+        BOOL theStopFlag = NO;
+        for (NSUInteger N = 0; theStopFlag == NO && [self step:&theError] == YES; N++)
+            {
+            CSqliteRow *theRow = [self row:&theError];
+            block(theRow, N, &theStopFlag);
+            }
+        }
+            
+        
+        
+
+
+    }
 
 @end
 

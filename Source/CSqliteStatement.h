@@ -65,4 +65,7 @@
 
 - (NSEnumerator *)enumerator;
 
+- (void)enumerateObjectsUsingBlock:(void (^)(CSqliteRow *row, NSUInteger idx, BOOL *stop))block;
+- (void)enumerateObjectsWithOptions:(NSEnumerationOptions)opts usingBlock:(void (^)(CSqliteRow *row, NSUInteger idx, BOOL *stop))block;
+
 @end
