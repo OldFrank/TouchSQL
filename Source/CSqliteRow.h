@@ -14,6 +14,8 @@
 
 - (id)initWithStatement:(CSqliteStatement *)inStatement;
 
+- (id)objectAtIndex:(NSUInteger)inIndex;
+
 - (id)objectForKey:(id)aKey;
 - (NSArray *)allKeys;
 - (NSArray *)allValues;

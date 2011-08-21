@@ -64,6 +64,13 @@
     return([self objectForKey:aKey]);
     }
 
+#pragma mark -
+
+- (id)objectAtIndex:(NSUInteger)inIndex;
+    {
+    return([self.allValues objectAtIndex:inIndex]);
+    }
+
 - (id)objectForKey:(id)aKey
     {
     NSInteger theIndex = [self.statement.columnNames indexOfObject:aKey];
