@@ -42,7 +42,10 @@
                 self = NULL;
                 return(NULL);
                 }
-            [theRow addObject:theValue];
+            if (theValue)
+                {
+                [theRow addObject:theValue];
+                }
             }
         allValues = [theRow copy];
         }
@@ -74,8 +77,13 @@
 - (id)objectForKey:(id)aKey
     {
     NSInteger theIndex = [self.statement.columnNames indexOfObject:aKey];
+    id theValue = [self.allValues objectAtIndex:theIndex];
+    if (theValue == [NSNull null])
+        {
+        theValue = NULL;
+        }
     
-    return([self.allValues objectAtIndex:theIndex]);
+    return(theValue);
     }
     
 - (NSArray *)allKeys
