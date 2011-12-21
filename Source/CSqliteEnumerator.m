@@ -55,7 +55,7 @@
     if (self.statement.done == YES)
         return(NULL);
     [self.statement step:NULL];
-	return([self.statement row:NULL]);
+	return([self.statement fetchRowCapturingValues:NO error:NULL]);
     }
 
 @end

@@ -38,20 +38,46 @@ int main(int argc, char **argv)
         {
         NSError *theError = NULL;
         CSqliteDatabase *theDatabase = [[CSqliteDatabase alloc] initTemporary:&theError];
-        NSLog(@"%@", theDatabase);
+        if (theError)
+            {
+            NSLog(@"%@", theDatabase);
+            NSLog(@"Error: %@", theError);
+            }
         
         BOOL theResult;
         theResult = [theDatabase executeExpression:@"CREATE TABLE foo (name VARCHAR(100))" error:&theError];
-        NSLog(@"Error: %@", theError);
-        NSLog(@"%d", theResult);
+        if (theError)
+            {
+            NSLog(@"%d", theResult);
+            NSLog(@"Error: %@", theError);
+            }
         
         theResult = [theDatabase executeExpression:@"INSERT INTO foo VALUES ('testname') " error:&theError];
-        NSLog(@"Error: %@", theError);
-        NSLog(@"%d", theResult);
+        if (theError)
+            {
+            NSLog(@"%d", theResult);
+            NSLog(@"Error: %@", theError);
+            }
+
+        theResult = [theDatabase executeExpression:@"INSERT INTO foo VALUES ('testname2') " error:&theError];
+        if (theError)
+            {
+            NSLog(@"%d", theResult);
+            NSLog(@"Error: %@", theError);
+            }
         
-        CSqliteStatement *theStatement = [theDatabase statementWithString:@"SELECT * FROM foo WHERE 1"];
+        CSqliteStatement *theStatement = [theDatabase statementWithString:@"SELECT * FROM foo"];
+        [theStatement enumerateObjectsUsingBlock:^(CSqliteRow *row, NSUInteger idx, BOOL *stop) {
+            NSLog(@"%@", row);
+            }];
         
-        NSLog(@"Error: %@", theError);
+        NSLog(@"Fast enum");
+        [theStatement reset:NULL];
+        
+        if (theError)
+            {
+            NSLog(@"Error: %@", theError);
+            }
         for (CSqliteRow *theRow in theStatement)
             {
             NSLog(@"%@", theRow);

@@ -251,15 +251,6 @@
 
 - (id)columnValueAtIndex:(NSInteger)inIndex error:(NSError **)outError
     {
-    if (self.done)
-        {
-        if (outError)
-            {
-            *outError = [NSError errorWithDomain:@"TODO" code:-1 userInfo:NULL];
-            }
-        return(NULL);
-        }
-    
     int theColumnType = sqlite3_column_type(self.statement, (int)inIndex);
     id theValue = NULL;
     switch (theColumnType)
@@ -397,15 +388,22 @@
 
 #pragma mark -
 
-- (CSqliteRow *)row:(NSError **)outError;
+- (CSqliteRow *)fetchRowCapturingValues:(BOOL)inCaptureValues error:(NSError **)outError;
     {
     CSqliteRow *theRow = [[CSqliteRow alloc] initWithStatement:self];
+    if (inCaptureValues)
+        {
+        if ([theRow captureValues:outError] == NO)
+            {
+            return(NULL);
+            }
+        }
     return(theRow);
     }
 
 #pragma mark -
 
-- (NSArray *)rows:(NSError **)outError
+- (NSArray *)fetchRowsCapturingValues:(BOOL)inCaptureValues error:(NSError **)outError;
     {
     NSMutableArray *theRows = [NSMutableArray array];
     for (CSqliteRow *theRow in self)
@@ -437,7 +435,7 @@
 
     while (theObjectCount < len && [self step:&theError] == YES)
         {
-        id theRow = [self row:NULL];
+        id theRow = [self fetchRowCapturingValues:YES error:&theError];
         stackbuf[theObjectCount++] = theRow;
         }
 
@@ -468,7 +466,7 @@
         __block BOOL theStopFlag = NO;
         for (NSUInteger N = 0; theStopFlag == NO && [self step:&theError] == YES; N++)
             {
-            CSqliteRow *theRow = [self row:&theError];
+            CSqliteRow *theRow = [self fetchRowCapturingValues:NO error:&theError];
             
             dispatch_group_async(theGroup, theQueue, ^{
                 block(theRow, N, &theStopFlag);
@@ -484,15 +482,10 @@
         BOOL theStopFlag = NO;
         for (NSUInteger N = 0; theStopFlag == NO && [self step:&theError] == YES; N++)
             {
-            CSqliteRow *theRow = [self row:&theError];
+            CSqliteRow *theRow = [self fetchRowCapturingValues:NO error:&theError];
             block(theRow, N, &theStopFlag);
             }
         }
-            
-        
-        
-
-
     }
 
 @end

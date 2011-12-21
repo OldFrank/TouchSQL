@@ -51,14 +51,14 @@
 - (NSArray *)rowsForExpression:(NSString *)inExpression error:(NSError **)outError
     {
     CSqliteStatement *theStatement = [self statementWithString:inExpression];
-    return([theStatement rows:outError]);
+    return([theStatement fetchRowsCapturingValues:YES error:outError]);
     }
 
 - (CSqliteRow *)rowForExpression:(NSString *)inExpression error:(NSError **)outError
     {
     CSqliteStatement *theStatement = [self statementWithString:inExpression];
     [theStatement step:outError];
-    CSqliteRow *theRow = [theStatement row:outError];
+    CSqliteRow *theRow = [theStatement fetchRowCapturingValues:NO error:outError];
     return(theRow);
     }
 

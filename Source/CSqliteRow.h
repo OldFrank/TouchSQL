@@ -35,7 +35,11 @@
 
 @interface CSqliteRow : NSObject
 
+@property (readonly, nonatomic, assign) NSUInteger count;
+
 - (id)initWithStatement:(CSqliteStatement *)inStatement;
+
+- (BOOL)captureValues:(NSError **)outError;
 
 - (id)objectAtIndex:(NSUInteger)inIndex;
 

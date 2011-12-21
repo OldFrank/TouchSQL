@@ -63,8 +63,8 @@
 - (BOOL)bindValue:(id)inValue toBinding:(NSString *)inBinding transientValue:(BOOL)inTransientValues error:(NSError **)outError;
 - (BOOL)bindValues:(NSDictionary *)inValues transientValues:(BOOL)inTransientValues error:(NSError **)outError;
 
-- (CSqliteRow *)row:(NSError **)outError;
-- (NSArray *)rows:(NSError **)outError;
+- (CSqliteRow *)fetchRowCapturingValues:(BOOL)inCaptureValues error:(NSError **)outError;
+- (NSArray *)fetchRowsCapturingValues:(BOOL)inCaptureValues error:(NSError **)outError;
 
 - (NSEnumerator *)enumerator;
 
